@@ -1,100 +1,101 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
+	// "fmt"
+	"image/color"
+	"log"
 	"os"
-	"regexp"
+
+	"gioui.org/app"
+	"gioui.org/layout"
+	"gioui.org/op"
+	"gioui.org/text"
+	"gioui.org/widget"
+	"gioui.org/widget/material"
+	"gioui.org/x/explorer"
 )
 
-// ParsedReference stores parsed components
-type ParsedReference struct {
-	Tag        string
-	ItemName   string
-	SourceBook string
-	FluffText  string
-}
-
-func parseReferencesFromJSON(filePath string) ([]ParsedReference, error) {
-	var results []ParsedReference
-
-	data, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		return nil, err
-	}
-
-	var jsonContent interface{}
-	if err := json.Unmarshal(data, &jsonContent); err != nil {
-		return nil, err
-	}
-
-	// Case 1: Tag-based pattern: {@tag name|source|fluff}
-	taggedPattern := regexp.MustCompile(`{@(\w+)\s([^|{}]+)(?:\|([^|{}]+))?(?:\|([^{}]+))?}`)
-
-	// Case 2: Simple pattern: item|source
-	simplePattern := regexp.MustCompile(`^([^|{}]+)\|([^|{}]+)$`)
-
-	// Recursive walker
-	var walk func(interface{})
-	walk = func(node interface{}) {
-		switch val := node.(type) {
-		case map[string]interface{}:
-			for _, v := range val {
-				walk(v)
-			}
-		case []interface{}:
-			for _, item := range val {
-				walk(item)
-			}
-		case string:
-			// Try tagged pattern
-			for _, match := range taggedPattern.FindAllStringSubmatch(val, -1) {
-				if len(match) >= 3 {
-					ref := ParsedReference{
-						Tag:        match[1],
-						ItemName:   match[2],
-						SourceBook: "",
-						FluffText:  "",
-					}
-					if len(match) >= 4 {
-						ref.SourceBook = match[3]
-					}
-					if len(match) == 5 {
-						ref.FluffText = match[4]
-					}
-					if ref.Tag == "b" || ref.Tag == "book" {
-						continue
-					}
-					results = append(results, ref)
-				}
-			}
-			// Try simple pattern (only if not inside tagged form)
-			if match := simplePattern.FindStringSubmatch(val); match != nil {
-				ref := ParsedReference{
-					Tag:        "",
-					ItemName:   match[1],
-					SourceBook: match[2],
-					FluffText:  "",
-				}
-				results = append(results, ref)
-			}
-		}
-	}
-
-	walk(jsonContent)
-	return results, nil
-}
-
 func main() {
-	refs, err := parseReferencesFromJSON("C:\\Users\\Maksym\\Desktop\\plutonium\\data\\backgrounds.json")
-	if err != nil {
-		fmt.Println("Error:", err)
-		os.Exit(1)
-	}
+	go func() {
+		window := new(app.Window)
+		err := run(window)
+		if err != nil {
+			log.Fatal(err)
+		}
+		os.Exit(0)
+	}()
+	app.Main()
+}
 
-	for _, ref := range refs {
-		fmt.Printf("Tag: %s | Name: %s | Source: %s | Fluff: %s\n",
-			ref.Tag, ref.ItemName, ref.SourceBook, ref.FluffText)
+func run(window *app.Window) error {
+	theme := material.NewTheme()
+	var ops op.Ops
+
+	// Persistent state for editor and button
+	var editor widget.Editor
+	var button widget.Clickable
+
+	// Channel to receive selected file path
+	pathCh := make(chan string, 1)
+
+	// Create explorer instance for this window
+	exp := explorer.NewExplorer(window)
+
+	for {
+		e := window.Event()
+		exp.ListenEvents(e) // Listen for every event
+		switch e := e.(type) {
+		case app.DestroyEvent:
+			return e.Err
+		case app.FrameEvent:
+			gtx := app.NewContext(&ops, e)
+
+			// Check for file path from goroutine
+			select {
+			case path := <-pathCh:
+				editor.SetText(path)
+			default:
+			}
+
+			// Layout: vertical stack
+			layout.Flex{
+				Axis:    layout.Vertical,
+				Spacing: layout.SpaceStart,
+			}.Layout(gtx,
+				// Title label
+				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					title := material.H1(theme, "Hello, Gio")
+					maroon := color.NRGBA{R: 127, G: 0, B: 0, A: 255}
+					title.Color = maroon
+					title.Alignment = text.Middle
+					return title.Layout(gtx)
+				}),
+				// Text field
+				layout.Rigid(
+					func(gtx layout.Context) layout.Dimensions {
+						return material.Editor(theme, &editor, "Enter text...").Layout(gtx)
+					},
+				),
+				// Button
+				layout.Rigid(
+					func(gtx layout.Context) layout.Dimensions {
+						if button.Clicked(gtx) {
+							go func() {
+								reader, err := exp.ChooseFile()
+								if err == nil && reader != nil {
+									defer reader.Close()
+									if f, ok := reader.(*os.File); ok {
+										pathCh <- f.Name()
+									}
+								}
+							}()
+						}
+						return material.Button(theme, &button, "Submit").Layout(gtx)
+					},
+				),
+			)
+
+			e.Frame(gtx.Ops)
+		}
 	}
 }
