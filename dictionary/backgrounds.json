@@ -1,0 +1,35 @@
+{
+    "background": [
+        {
+            "origin_name" : "Acolyte",
+            "origin_source" : "XPHB",
+            "name" : "Аколіт [Acolyte]",
+            "entries": [
+                {
+                    "items": [
+                        {
+                            "name" : "Здібності:",
+                            "entry" : "Інтелект, Мудрість, Харизма"
+                        },
+                        {
+                            "name": "Риси:",
+                            "entry": "{@feat Magic Initiate|XPHB} (Клірик)"
+                        },
+                        {
+                            "name": "Опановані навички:",
+                            "entry": "{@skill Insight|XPHB}, {@skill Religion|XPHB}"
+                        },
+                        {
+                            "name": "Опановані інструменти:",
+                            "entry": "{@item Calligrapher's Supplies|XPHB}"
+                        },
+                        {
+                            "name": "Спорядження:",
+                            "entry": "Оберіть А або Б: (А) {@item Calligrapher's Supplies|XPHB}, {@item Book|XPHB|Book (prayers)}, {@item Holy Symbol|XPHB}, {@item Parchment|XPHB} (10 листків), {@item Robe|xphb}, 8 ЗМ; або (Б) 50 ЗМ"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

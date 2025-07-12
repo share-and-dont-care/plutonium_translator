@@ -1,0 +1,125 @@
+{
+    "_meta": {
+        "internalCopies": [
+            "background"
+        ]
+    },
+    "background": [
+        {
+            "ability": [
+                {
+                    "choose": {
+                        "weighted": {
+                            "from": [
+                                "int",
+                                "wis",
+                                "cha"
+                            ],
+                            "weights": [
+                                2,
+                                1
+                            ]
+                        }
+                    }
+                },
+                {
+                    "choose": {
+                        "weighted": {
+                            "from": [
+                                "int",
+                                "wis",
+                                "cha"
+                            ],
+                            "weights": [
+                                1,
+                                1,
+                                1
+                            ]
+                        }
+                    }
+                }
+            ],
+            "basicRules2024": true,
+            "edition": "one",
+            "entries": [
+                {
+                    "items": [
+                        {
+                            "entry": "Інтелект, Мудрість, Харизма",
+                            "name": "Здібності:"
+                        },
+                        {
+                            "entry": "{@feat Magic Initiate|XPHB} (Клірик)",
+                            "name": "Риси:"
+                        },
+                        {
+                            "entry": "{@skill Insight|XPHB}, {@skill Religion|XPHB}",
+                            "name": "Опановані навички:"
+                        },
+                        {
+                            "entry": "{@item Calligrapher's Supplies|XPHB}",
+                            "name": "Опановані інструменти:"
+                        },
+                        {
+                            "entry": "Оберіть А або Б: (А) {@item Calligrapher's Supplies|XPHB}, {@item Book|XPHB|Book (prayers)}, {@item Holy Symbol|XPHB}, {@item Parchment|XPHB} (10 листків), {@item Robe|xphb}, 8 ЗМ; або (Б) 50 ЗМ",
+                            "name": "Спорядження:"
+                        }
+                    ]
+                }
+            ],
+            "feats": [
+                {
+                    "magic initiate; cleric|xphb": true
+                }
+            ],
+            "hasFluff": true,
+            "hasFluffImages": true,
+            "name": "Аколіт [Acolyte]",
+            "page": 178,
+            "skillProficiencies": [
+                {
+                    "insight": true,
+                    "religion": true
+                }
+            ],
+            "source": "XPHB",
+            "srd52": true,
+            "startingEquipment": [
+                {
+                    "A": [
+                        {
+                            "displayName": "Book (Prayers)",
+                            "item": "book|xphb"
+                        },
+                        {
+                            "item": "calligrapher's supplies|xphb"
+                        },
+                        {
+                            "item": "holy symbol|xphb"
+                        },
+                        {
+                            "item": "parchment|xphb",
+                            "quantity": 10
+                        },
+                        {
+                            "item": "robe|xphb"
+                        },
+                        {
+                            "value": 800
+                        }
+                    ],
+                    "B": [
+                        {
+                            "value": 5000
+                        }
+                    ]
+                }
+            ],
+            "toolProficiencies": [
+                {
+                    "calligrapher's supplies": true
+                }
+            ]
+        }
+    ]
+}
